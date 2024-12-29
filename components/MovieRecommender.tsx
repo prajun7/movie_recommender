@@ -16,12 +16,12 @@ const MovieRecommender = () => {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen">
+    <div className="flex justify-center h-screen text-white">
       <div className="p-6 rounded-lg shadow-md text-center">
-        <h1 className="mb-4 text-xl font-semibold text-gray-700">
-          Make a Selection
-        </h1>
-        <div className="flex items-center space-x-4">
+        <div className="mb-4 text-12xl font-semibold">
+          Watch the Movie You Like
+        </div>
+        <div className="mb-14">
           <select
             className="px-4 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-300"
             onChange={(e) => setSelectedOption(e.target.value)}
@@ -33,15 +33,18 @@ const MovieRecommender = () => {
               </option>
             ))}
           </select>
+        </div>
+        <div className="mt-8">
           <button
             onClick={handleRecommend}
-            className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600"
+            className="px-4 py-2 bg-blue-500 rounded-md hover:bg-blue-600"
           >
             Recommend
           </button>
         </div>
+
         {selectedOption && (
-          <p className="mt-4 text-gray-600">
+          <p className="mt-4">
             Selected Option:{" "}
             <span className="font-medium">{selectedOption}</span>
           </p>
