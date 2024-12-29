@@ -1,3 +1,7 @@
+## Movie Recommender
+This movie recommender system leverages the K-Nearest Neighbors (KNN) algorithm to provide personalized movie recommendations. By using the TMDB dataset, which includes comprehensive movie details and credits, the system processes and cleans the data to ensure accurate results. When a user selects a movie, the model analyzes its features, such as genre, cast, and other metadata, to recommend five similar movies. This approach enhances the user experience by offering relevant suggestions based on their initial movie choice, all powered by a well-trained machine learning model.
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
