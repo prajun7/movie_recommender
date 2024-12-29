@@ -9,30 +9,6 @@ interface MovieType {
   tags: string;
 }
 
-// Function to fetch movie posters from TMDb API
-const fetchPoster = async (movieId: number) => {
-  const apiKey = "8265bd1679663a7ea12ac168da84d2e8"; // Your TMDb API key
-  const url = `https://api.themoviedb.org/3/movie/${movieId}?api_key=${apiKey}&language=en-US`;
-
-  try {
-    // Fetch the movie data from the API
-    const response = await fetch(url);
-    const data = await response.json();
-
-    // Extract the poster path
-    const posterPath = data.poster_path;
-
-    // Construct the full poster URL
-    const fullPosterUrl = `https://image.tmdb.org/t/p/w500${posterPath}`;
-
-    // Return the full poster URL
-    return fullPosterUrl;
-  } catch (error) {
-    console.error("Error fetching movie poster:", error);
-    return null;
-  }
-};
-
 const MovieRecommender = () => {
   const [selectedOption, setSelectedOption] = useState("");
   const [movies, setMovies] = useState<MovieType[]>([]); // State to store movies
@@ -44,6 +20,33 @@ const MovieRecommender = () => {
     names: [],
     posterUrl: [],
   });
+
+  // Function to fetch movie posters from TMDb API
+  const fetchPoster = async (movieId: number) => {
+    const apiKey = "8265bd1679663a7ea12ac168da84d2e8"; // Your TMDb API key
+    const url = `https://api.themoviedb.org/3/movie/${movieId}?api_key=${apiKey}&language=en-US`;
+
+    try {
+      // Fetch the movie data from the API
+      const response = await fetch(url);
+      const data = await response.json();
+
+      // Extract the poster path
+      const posterPath = data.poster_path;
+
+      // Construct the full poster URL, if available
+      if (posterPath) {
+        return `https://image.tmdb.org/t/p/w500${posterPath}`;
+      }
+
+      // Fallback if poster is not available
+      return "https://via.placeholder.com/500x750?text=No+Image"; // Use a placeholder image
+    } catch (error) {
+      console.error("Error fetching movie poster:", error);
+      // Return a placeholder image in case of an error
+      return "https://via.placeholder.com/500x750?text=No+Image";
+    }
+  };
 
   // Function to fetch and decompress the movies data
   const fetchMovies = async () => {
@@ -81,11 +84,11 @@ const MovieRecommender = () => {
     fetchSimilarity();
   }, []);
 
-  // Function to fetch movie posters (this can be modified as per your API for fetching posters)
-  const fetchPoster = (movieId: number) => {
-    // You can replace this with your API for fetching movie posters
-    return `https://image.tmdb.org/t/p/w500/${movieId}.jpg`;
-  };
+  // // Function to fetch movie posters (this can be modified as per your API for fetching posters)
+  // const fetchPoster = (movieId: number) => {
+  //   // You can replace this with your API for fetching movie posters
+  //   return `https://image.tmdb.org/t/p/w500/${movieId}.jpg`;
+  // };
 
   // Modify the recommend function to include poster fetching
   const recommend = async (movie: string) => {
@@ -130,7 +133,7 @@ const MovieRecommender = () => {
 
   return (
     <div>
-      <div className="flex flex-col items-center justify-center min-h-screen px-4 bg-black text-white">
+      <div className="flex flex-col items-center justify-center mt-20 x-4 bg-black text-white">
         <h1 className="text-3xl font-extrabold text-center tracking-tight sm:text-4xl">
           Watch the Movie You Like
         </h1>
@@ -172,31 +175,30 @@ const MovieRecommender = () => {
               Recommend
             </button>
           </div>
-          {selectedOption && (
-            <p className="mt-6 text-center text-gray-400">
-              Selected Movie:{" "}
-              <span className="font-semibold text-white">{selectedOption}</span>
-            </p>
-          )}
         </div>
-      </div>
-      {recommendedMovies.names.length > 0 && (
-        <div className="mt-8 w-full max-w-md p-6 bg-gray-900 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-bold text-white">Recommended Movies</h2>
-          <div className="mt-4 grid grid-cols-2 gap-4">
-            {recommendedMovies.names.map((movie, index) => (
-              <div key={index} className="text-center">
-                <img
-                  src={recommendedMovies.posterUrl[index]}
-                  alt={movie}
-                  className="w-full h-32 object-cover rounded-lg mb-2"
-                />
-                <p className="text-gray-300">{movie}</p>
-              </div>
-            ))}
+
+        {recommendedMovies.names.length > 0 && (
+          <div className="mt-8 mb-36 w-full max-w-5xl p-6 rounded-lg shadow-lg">
+            <h2 className="text-2xl text-center font-bold text-white mb-8">
+              Recommended Movies
+            </h2>
+            <div className="mt-4 grid grid-cols-5 gap-4">
+              {recommendedMovies.names.map((movie, index) => (
+                <div key={index} className="text-center">
+                  <img
+                    src={recommendedMovies.posterUrl[index]}
+                    alt={movie}
+                    className="w-full h-full object-cover rounded-lg mb-2"
+                  />
+                  <p className="text-gray-300 font-bold tracking-wide">
+                    {movie}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
