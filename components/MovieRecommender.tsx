@@ -165,12 +165,8 @@ const MovieRecommender = () => {
                     src={recommendedMovies.posterUrl[index]}
                     alt={movie}
                     className="w-full h-full object-cover rounded-lg mb-2 
-              bg-gray-300 bg-cover bg-center 
-              blur-lg transition-all duration-500 ease-in-out 
-              hover:blur-0"
-                    style={{
-                      backgroundImage: `url('/path/to/placeholder-image.jpg')`,
-                    }}
+          blur-lg transition-all duration-500 ease-in-out 
+          hover:blur-0"
                     onLoad={(e) =>
                       (e.target as HTMLImageElement).classList.remove("blur-lg")
                     }
