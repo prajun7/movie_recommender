@@ -133,8 +133,8 @@ const MovieRecommender = () => {
           Watch the Movie You Like
         </h1>
         <p className="mt-4 text-lg text-center text-gray-400 max-w-xl">
-          Select a movie you enjoyed, and we’ll recommend 5 similar movies
-          you'll absolutely love. Let's make your next movie night
+          Select a movie you enjoyed, and we&apos;ll recommend 5 similar movies
+          you&apos;ll absolutely love. Let&apos;s make your next movie night
           unforgettable!
         </p>
         <div className="mt-8 w-full max-w-md p-6 bg-gray-900 rounded-lg shadow-lg">
