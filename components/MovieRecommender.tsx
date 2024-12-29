@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import pako from "pako"; // Import pako for gzip decompression
 
 interface MovieType {
-  movied_id: number;
+  movie_id: number;
   title: string;
   tags: string;
 }
@@ -12,6 +12,12 @@ interface MovieType {
 const MovieRecommender = () => {
   const [selectedOption, setSelectedOption] = useState("");
   const [movies, setMovies] = useState<MovieType[]>([]); // State to store movies
+  const [similarity, setSimilarity] = useState([]); // State to store similarity data
+  const [recommendedMovies, setRecommendedMovies] = useState<{
+    names: string[];
+  }>({
+    names: [],
+  });
 
   // Function to fetch and decompress the movies data
   const fetchMovies = async () => {
@@ -28,13 +34,60 @@ const MovieRecommender = () => {
     }
   };
 
+  // Function to fetch and decompress the similarity data
+  const fetchSimilarity = async () => {
+    try {
+      const response = await fetch("/similarity.json.gz"); // Fetch the .gz file from the public folder
+      const arrayBuffer = await response.arrayBuffer(); // Read the file as an array buffer
+      const decompressedData = pako.ungzip(new Uint8Array(arrayBuffer), {
+        to: "string",
+      }); // Decompress the data using pako
+      const jsonData = JSON.parse(decompressedData); // Parse the decompressed JSON
+      setSimilarity(jsonData); // Store the similarity data in state
+    } catch (error) {
+      console.error("Error fetching similarity data:", error);
+    }
+  };
+
+  // Fetch movies and similarity data when the component is mounted
   useEffect(() => {
-    fetchMovies(); // Fetch movies when the component is mounted
+    fetchMovies();
+    fetchSimilarity();
   }, []);
+
+  // Function to fetch movie posters (this can be modified as per your API for fetching posters)
+  const fetchPoster = (movieId: number) => {
+    // You can replace this with your API for fetching movie posters
+    return `https://image.tmdb.org/t/p/w500/${movieId}.jpg`;
+  };
+
+  // Recommend similar movies based on selected movie
+  const recommend = (movie: string) => {
+    const index = movies.findIndex((m) => m.title === movie); // Find movie index based on title
+
+    // If movie is not found, return empty lists
+    if (index === -1) return { names: [], posters: [] };
+
+    // Get the similarity scores for the selected movie
+    const movieSimilarities = similarity[index];
+
+    // Sort the similarities in descending order and get top 5 most similar movies (excluding the movie itself)
+    const sortedSimilarities = [...movieSimilarities]
+      .map((score, i) => ({ index: i, score }))
+      .sort((a, b) => b.score - a.score)
+      .slice(1, 6); // Exclude the movie itself
+
+    const recommendedMovieNames = sortedSimilarities.map(
+      (item) => movies[item.index].title
+    );
+
+    return { names: recommendedMovieNames };
+  };
 
   const handleRecommend = () => {
     if (selectedOption) {
-      alert(`We’ll recommend 5 movies similar to ${selectedOption}!`);
+      const { names } = recommend(selectedOption);
+      setRecommendedMovies({ names });
     } else {
       alert("Please select a movie first.");
     }
@@ -68,11 +121,11 @@ const MovieRecommender = () => {
             {movies.length > 0 ? (
               movies.map((movie, index) => (
                 <option key={index} value={movie.title}>
-                  {movie.title} {/* Display the movie title */}
+                  {movie.title}
                 </option>
               ))
             ) : (
-              <option>Loading movies...</option> // Show a loading state until movies are fetched
+              <option>Loading movies...</option>
             )}
           </select>
           <button
@@ -89,6 +142,23 @@ const MovieRecommender = () => {
           </p>
         )}
       </div>
+      {recommendedMovies.names.length > 0 && (
+        <div className="mt-8 w-full max-w-md p-6 bg-gray-900 rounded-lg shadow-lg">
+          <h2 className="text-2xl font-bold text-white">Recommended Movies</h2>
+          <div className="mt-4 grid grid-cols-2 gap-4">
+            {recommendedMovies.names.map((movie, index) => (
+              <div key={index} className="text-center">
+                <img
+                  src={recommendedMovies.posters[index]}
+                  alt={movie}
+                  className="w-full h-32 object-cover rounded-lg mb-2"
+                />
+                <p className="text-gray-300">{movie}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
