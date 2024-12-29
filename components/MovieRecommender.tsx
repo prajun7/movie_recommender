@@ -24,7 +24,8 @@ const MovieRecommender = () => {
 
   // Function to fetch movie posters from TMDb API
   const fetchPoster = async (movieId: number) => {
-    const apiKey = "8265bd1679663a7ea12ac168da84d2e8"; // Your TMDb API key
+    const apiKey = process.env.NEXT_PUBLIC_TMDB_API_KEY;
+
     const url = `https://api.themoviedb.org/3/movie/${movieId}?api_key=${apiKey}&language=en-US`;
 
     try {
