@@ -9,14 +9,40 @@ interface MovieType {
   tags: string;
 }
 
+// Function to fetch movie posters from TMDb API
+const fetchPoster = async (movieId: number) => {
+  const apiKey = "8265bd1679663a7ea12ac168da84d2e8"; // Your TMDb API key
+  const url = `https://api.themoviedb.org/3/movie/${movieId}?api_key=${apiKey}&language=en-US`;
+
+  try {
+    // Fetch the movie data from the API
+    const response = await fetch(url);
+    const data = await response.json();
+
+    // Extract the poster path
+    const posterPath = data.poster_path;
+
+    // Construct the full poster URL
+    const fullPosterUrl = `https://image.tmdb.org/t/p/w500${posterPath}`;
+
+    // Return the full poster URL
+    return fullPosterUrl;
+  } catch (error) {
+    console.error("Error fetching movie poster:", error);
+    return null;
+  }
+};
+
 const MovieRecommender = () => {
   const [selectedOption, setSelectedOption] = useState("");
   const [movies, setMovies] = useState<MovieType[]>([]); // State to store movies
   const [similarity, setSimilarity] = useState([]); // State to store similarity data
   const [recommendedMovies, setRecommendedMovies] = useState<{
     names: string[];
+    posterUrl: string[];
   }>({
     names: [],
+    posterUrl: [],
   });
 
   // Function to fetch and decompress the movies data
@@ -61,8 +87,8 @@ const MovieRecommender = () => {
     return `https://image.tmdb.org/t/p/w500/${movieId}.jpg`;
   };
 
-  // Recommend similar movies based on selected movie
-  const recommend = (movie: string) => {
+  // Modify the recommend function to include poster fetching
+  const recommend = async (movie: string) => {
     const index = movies.findIndex((m) => m.title === movie); // Find movie index based on title
 
     // If movie is not found, return empty lists
@@ -81,7 +107,15 @@ const MovieRecommender = () => {
       (item) => movies[item.index].title
     );
 
-    return { names: recommendedMovieNames };
+    // Fetch the poster URLs for the recommended movies
+    const recommendedMoviePosters = await Promise.all(
+      sortedSimilarities.map(async (item) => {
+        const movieId = movies[item.index].movie_id; // Assuming movie_id is available in your data
+        return await fetchPoster(movieId); // Fetch the poster for each recommended movie
+      })
+    );
+
+    return { names: recommendedMovieNames, posters: recommendedMoviePosters };
   };
 
   const handleRecommend = () => {
@@ -149,7 +183,7 @@ const MovieRecommender = () => {
             {recommendedMovies.names.map((movie, index) => (
               <div key={index} className="text-center">
                 <img
-                  src={recommendedMovies.posters[index]}
+                  src={recommendedMovies.posterUrl[index]}
                   alt={movie}
                   className="w-full h-32 object-cover rounded-lg mb-2"
                 />
