@@ -85,12 +85,6 @@ const MovieRecommender = () => {
     fetchSimilarity();
   }, []);
 
-  // // Function to fetch movie posters (this can be modified as per your API for fetching posters)
-  // const fetchPoster = (movieId: number) => {
-  //   // You can replace this with your API for fetching movie posters
-  //   return `https://image.tmdb.org/t/p/w500/${movieId}.jpg`;
-  // };
-
   // Modify the recommend function to include poster fetching
   const recommend = async (movie: string) => {
     const index = movies.findIndex((m) => m.title === movie); // Find movie index based on title
