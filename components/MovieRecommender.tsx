@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import pako from "pako"; // Import pako for gzip decompression
+import Dropdown from "./Dropdown";
 
 interface MovieType {
   movie_id: number;
@@ -121,11 +122,11 @@ const MovieRecommender = () => {
     return { names: recommendedMovieNames, posters: recommendedMoviePosters };
   };
 
-  const handleRecommend = async () => {
-    // Mark the function as async
-    if (selectedOption) {
-      const { names, posters } = await recommend(selectedOption); // Wait for the promise to resolve
-      setRecommendedMovies({ names, posterUrl: posters }); // Set both names and posters
+  const handleRecommend = async (movie: string) => {
+    if (movie) {
+      setSelectedOption(movie); // Update the selected movie
+      const { names, posters } = await recommend(movie);
+      setRecommendedMovies({ names, posterUrl: posters });
     } else {
       alert("Please select a movie first.");
     }
@@ -150,30 +151,11 @@ const MovieRecommender = () => {
             >
               Select a Movie
             </label>
-            <select
-              id="movie-select"
-              className="w-full px-4 py-2 border border-gray-700 rounded-md bg-gray-800 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onChange={(e) => setSelectedOption(e.target.value)}
-            >
-              <option value="" disabled selected>
-                Choose a movie
-              </option>
-              {movies.length > 0 ? (
-                movies.map((movie, index) => (
-                  <option key={index} value={movie.title}>
-                    {movie.title}
-                  </option>
-                ))
-              ) : (
-                <option>Loading movies...</option>
-              )}
-            </select>
-            <button
-              onClick={handleRecommend}
-              className="w-full px-4 py-2 font-semibold text-white bg-gradient-to-r from-blue-500 to-purple-600 rounded-md hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              Recommend
-            </button>
+            <Dropdown
+              options={movies.map((movie) => movie.title)}
+              onSelect={handleRecommend}
+              selectedOption={selectedOption} // Pass selectedOption to Dropdown
+            />
           </div>
         </div>
 
